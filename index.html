@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ROYAL TECH — Solutions informatiques & développement</title>
+  <meta name="description" content="Maintenance informatique, installation de systèmes, développement web & apps, réseaux, vente de logiciels et clés d'activation. H24.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <!-- Icônes Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: rgba(255,255,255,0.08);
+      --glass: rgba(255,255,255,0.12);
+      --text: #e8f1ff;
+      --muted: #a7b4c6;
+      --accent: #5ce1e6;
+      --accent2: #b367ff;
+      --danger: #ff5470;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; scroll-behavior: smooth; }
+    a { color: var(--accent); text-decoration: none; }
+    
+    /* Layout */
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      backdrop-filter: saturate(180%) blur(10px);
+      background: linear-gradient(0deg, rgba(11,15,26,0.4), rgba(11,15,26,0.7));
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .nav {
+      display: flex; align-items: center; justify-content: flex-start; padding: 14px 0;
+    }
+    .brand { 
+      display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: 0.5px; 
+      margin-right: auto;
+    }
+    .brand .logo {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+      box-shadow: 0 0 20px var(--accent), inset 0 0 10px rgba(255,255,255,0.15);
+      transform: rotate(8deg);
+    }
+    .menu { display: flex; gap: 18px; margin-left: 40px; }
+    .menu a { padding: 8px 12px; border-radius: 10px; color: var(--text); transition: all 0.3s ease; }
+    .menu a:hover { background: var(--glass); transform: translateY(-2px); }
+    .menu-toggle { display: none; background: none; border: 1px solid rgba(255,255,255,0.18); color: var(--text); padding: 6px 10px; border-radius: 8px; }
+
+    /* Hero avec vidéo de fond CORRIGÉE */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 120px 0 80px;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+    }
+    .hero-video-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.3;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(11,15,26,0.9), rgba(92,225,230,0.1));
+      z-index: -1;
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 30px; align-items: center;
+      perspective: 1000px;
+    }
+    .card-3d {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px; padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,255,255,0.04);
+      transform: rotateY(-6deg) translateZ(20px);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      backdrop-filter: blur(10px);
+    }
+    .card-3d:hover { transform: rotateY(0deg) translateZ(30px); box-shadow: 0 30px 70px rgba(0,0,0,0.6); }
+    .hero h1 { margin: 0 0 10px; font-size: 2.4rem; text-shadow: 0 6px 24px rgba(92,225,230,0.3); }
+    .hero p { color: var(--muted); margin: 0 0 18px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #081018; font-weight: 700; border: none; border-radius: 12px; padding: 10px 16px; cursor: pointer;
+      box-shadow: 0 12px 30px rgba(92,225,230,0.3), 0 6px 18px rgba(179,103,255,0.25);
+      transition: all 0.3s ease;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(92,225,230,0.4); }
+    .btn.secondary { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.16); }
+
+    /* Sections Vidéos RESPONSIVES */
+    .video-section {
+      padding: 80px 0;
+      background: rgba(0,0,0,0.2);
+    }
+    .video-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .video-container.reverse {
+      direction: rtl;
+    }
+    .video-container.reverse > * {
+      direction: ltr;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      transform: perspective(1000px) rotateY(-5deg);
+      transition: transform 0.4s ease;
+    }
+    .video-wrapper:hover {
+      transform: perspective(1000px) rotateY(0deg);
+    }
+    /* Vidéos responsives */
+    .video-wrapper video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .video-content {
+      padding: 20px;
+    }
+    .video-content h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    /* Sections */
+    section { padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+    .section-title { font-size: 1.8rem; margin: 0 0 25px; }
+    .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+    .card {
+      background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 18px; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.45); }
+    .badge { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 999px; background: rgba(92,225,230,0.18); color: var(--accent); border: 1px solid rgba(92,225,230,0.3); }
+
+    /* Contact + commande */
+    .contact {
+      display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px;
+    }
+    .contact .cta { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px; }
+    .contact .cta .phone { font-size: 1.4rem; font-weight: 700; }
+    .contact .cta .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* Section Vêtements simplifiée */
+    .clothing-section {
+      background: linear-gradient(135deg, rgba(92,225,230,0.1), rgba(179,103,255,0.1));
+      padding: 40px 0;
+      text-align: center;
+    }
+    .clothing-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .phone-link {
+      display: inline-block;
+      background: var(--accent);
+      color: #081018;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      margin: 15px 0;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(92,225,230,0.3);
+    }
+    .phone-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(92,225,230,0.5);
+    }
+
+    /* Footer */
+    footer { padding: 36px 0 20px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.1); }
+    .socials { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .socials a {
+      width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 10px; background: var(--glass); border: 1px solid rgba(255,255,255,0.14);
+      transition: all 0.3s ease;
+    }
+    .socials a:hover { transform: translateY(-4px) scale(1.1); background: rgba(92,225,230,0.2); }
+
+    /* Bouton WhatsApp flottant AMÉLIORÉ */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7);
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5); }
+      50% { box-shadow: 0 4px 25px rgba(37, 211, 102, 0.8); }
+      100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5); }
+    }
+    .whatsapp-float i {
+      font-size: 30px;
+      color: white;
+    }
+
+    /* Responsive AMÉLIORÉ */
+    @media (max-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .contact { grid-template-columns: 1fr; }
+      .video-container { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2rem; }
+    }
+    @media (max-width: 768px) {
+      .menu { 
+        display: none; 
+        position: absolute; top: 100%; left: 0; width: 100%; 
+        background: var(--bg); flex-direction: column; padding: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      .menu.active { display: flex; }
+      .menu-toggle { display: inline-block; }
+      .grid { grid-template-columns: 1fr; }
+      .nav { justify-content: space-between; }
+      .brand { margin-right: 0; }
+      .hero { padding: 100px 0 60px; min-height: 60vh; }
+      .hero h1 { font-size: 1.8rem; }
+      .section-title { font-size: 1.5rem; }
+      .video-wrapper {
+        transform: none; /* Supprime l'effet 3D sur mobile */
+      }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 15px; }
+      .hero { padding: 80px 0 40px; }
+      .btn { padding: 8px 14px; font-size: 0.9rem; }
+      .card-3d { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bouton WhatsApp flottant AVEC VRAIE ICÔNE -->
+  <a href="https://wa.me/241074085772" class="whatsapp-float" target="_blank" aria-label="Contact WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>ROYAL TECH</span>
+      </div>
+      <nav class="menu" id="mainMenu">
+        <a href="#accueil">Accueil</a>
+        <a href="#services">Nos services</a>
+        <a href="#videos">Nos réalisations</a>
+        <a href="#apropos">À propos</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Accueil avec vidéo  -->
+    <section id="accueil" class="hero">
+      <video class="hero-video-bg" autoplay muted loop playsinline>
+        <source src="2.mp4" type="video/mp4">
+     
+      </video>
+      <div class="container hero-grid">
+        <div class="card-3d">
+          <h1>Bienvenue chez ROYAL TECH</h1>
+          <p>Votre partenaire de confiance pour toutes vos solutions informatiques. Maintenance, installation système, cybersécurité, développement web et bien plus encore.</p>
+          <div>
+            <button class="btn" id="btn-commande">Commander maintenant</button>
+            <a class="btn secondary" href="#services">Découvrir nos services</a>
+          </div>
+        </div>
+        <div class="video-wrapper">
+          <video controls poster="poster.jpg"autoplay muted loop playsinline>
+            <source src="1.mp4" type="video/mp4" />
+            
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nos services -->
+    <section id="services">
+      <div class="container">
+        <h2 class="section-title">Nos services</h2>
+        <div class="grid">
+          <div class="card">
+            <span class="badge">H24</span>
+            <h3>Maintenance informatique</h3>
+            <p>Diagnostic, nettoyage, hardware & software, sécurité, sauvegardes.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20maintenance%20informatique" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+          <div class="card">
+            <h3>Installation de systèmes</h3>
+            <p>Windows, Linux, macOS, drivers, partitionnement, configuration.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20une%20installation%20de%20système" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+          <div class="card">
+            <h3>Cybersécurité</h3>
+            <p>Protection des données, antivirus, firewall, sécurisation réseau.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20cybersécurité" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+          <div class="card">
+            <h3>Développement web</h3>
+            <p>Sites vitrines, e-commerce, SEO, performance, hébergement.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20développement%20web" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+          <div class="card">
+            <h3>Réseau informatique</h3>
+            <p>Routeurs, câblage, Wi-Fi pro, VPN, sécurité réseau.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20réseau" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+          <div class="card">
+            <h3>Support technique</h3>
+            <p>Assistance à distance, dépannage, formation utilisateur.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20support%20technique" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sections Vidéos RESPONSIVES -->
+    <section id="videos" class="video-section">
+      <div class="container">
+        <h2 class="section-title">Nos Réalisations</h2>
+        
+        <!-- Vidéo 1: Maintenance informatique -->
+        <div class="video-container">
+          <div class="video-wrapper">
+            <video controls poster="videos/maintenance-poster.jpg"autoplay muted loop playsinline>
+              <source src="3.mp4" type="video/mp4" />
+             
+            </video>
+          </div>
+          <div class="video-content">
+            <h3>Maintenance Informatique Professionnelle</h3>
+            <p>Découvrez notre processus complet de maintenance informatique : diagnostic approfondi, nettoyage matériel, optimisation logicielle et sécurisation de votre système. Nos techniciens certifiés interviennent rapidement pour garantir la performance et la longévité de votre équipement.</p>
+            <ul>
+              <li>Diagnostic complet et gratuit</li>
+              <li>Nettoyage physique et logiciel</li>
+              <li>Optimisation des performances</li>
+              <li>Sécurisation antivirus et firewall</li>
+              <li>Sauvegarde et récupération de données</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Vidéo 2: Installation système -->
+        <div class="video-container reverse" style="margin-top: 60px;">
+          <div class="video-wrapper">
+            <video controls poster="videos/installation-poster.jpg"auto muted loop playsinline>
+              <source src="4.mp4" type="video/mp4" />
+             
+            </video>
+          </div>
+          <div class="video-content">
+            <h3>Installation de Systèmes d'Exploitation</h3>
+            <p>Installation professionnelle de Windows, Linux et macOS avec configuration optimale. Nous assurons l'installation des drivers, la mise à jour du système et la configuration de vos logiciels essentiels pour une expérience utilisateur fluide et sécurisée.</p>
+            <ul>
+              <li>Installation Windows, Linux, macOS</li>
+              <li>Drivers et mises à jour inclus</li>
+              <li>Partitionnement personnalisé</li>
+              <li>Configuration optimale</li>
+              <li>Formation utilisateur incluse</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Vidéo 3: Cybersécurité -->
+        <div class="video-container" style="margin-top: 60px;">
+          <div class="video-wrapper">
+            <video controls poster="videos/cybersecurite-poster.jpg" autoplay muted loop playsinline>
+              <source src="5.mp4" type="video/mp4" />
+              
+            </video>
+          </div>
+          <div class="video-content">
+            <h3>Solutions de Cybersécurité</h3>
+            <p>Protégez vos données et votre vie privée avec nos solutions de cybersécurité avancées. Installation d'antivirus professionnels, configuration de firewalls, sécurisation réseau et formation aux bonnes pratiques de sécurité numérique.</p>
+            <ul>
+              <li>Antivirus et anti-malware</li>
+              <li>Firewall et protection réseau</li>
+              <li>Chiffrement des données</li>
+              <li>Audit de sécurité</li>
+              <li>Formation utilisateur</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- À propos -->
+    <section id="apropos">
+      <div class="container">
+        <h2 class="section-title">À propos de nous</h2>
+        <div class="card">
+          <p><strong>ROYAL TECH</strong> est votre partenaire de confiance pour toutes vos solutions informatiques. Forts de plusieurs années d'expérience, nous accompagnons particuliers et professionnels dans la maintenance, l'installation et la sécurisation de leurs systèmes informatiques.</p>
+          <p><strong>Notre mission :</strong> Vous offrir des services de qualité, rapides et fiables, avec un support disponible 24h/24. Nous nous engageons à vous fournir des solutions adaptées à vos besoins spécifiques.</p>
+          <p><strong>Nos valeurs :</strong> Professionnalisme, réactivité, expertise et satisfaction client.</p>
+          <p style="margin-top: 20px; text-align: center; font-style: italic;">© ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Vêtements simplifiée -->
+    <section class="clothing-section">
+      <div class="container clothing-content">
+        <h2>Collection Vêtements ROYAL TECH</h2>
+        <p>Découvrez notre collection exclusive de vêtements aux couleurs de ROYAL TECH. T-shirts, sweats et accessoires de qualité.</p>
+        <p><strong>Contactez-nous pour découvrir notre catalogue et passer commande !</strong></p>
+        
+        <!-- Numéro -->
+        <a href="tel:+241074085772" class="phone-link">
+          <i class="fas fa-phone"></i> Appelez-nous: +241 07 40 85 772
+        </a>
+        
+        <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20suis%20intéressé%20par%20votre%20collection%20de%20vêtements" class="btn" style="margin-top: 15px;">
+          <i class="fab fa-whatsapp"></i> Voir le catalogue WhatsApp
+        </a>
+      </div>
+    </section>
+
+    <!-- Contact / Service H24 -->
+    <section id="contact">
+      <div class="container contact">
+        <div class="cta">
+          <h2 class="section-title">Service H24</h2>
+          <p class="phone">Téléphone: <a href="tel:+241074085772" style="color: var(--accent);">+241 07 40 85 772</a></p>
+          <div class="actions">
+            <a class="btn" id="btn-whatsapp" href="https://wa.me/241074085772">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a class="btn secondary" href="mailto:contact@royaltech.ga">
+              <i class="fas fa-envelope"></i> Email
+            </a>
+          </div>
+          <p style="color: var(--muted); margin-top: 15px;">Cliquez pour commander directement. Réponse rapide garantie.</p>
+        </div>
+        <div class="cta">
+          <h3>Demander un devis</h3>
+          <form id="devis-form">
+            <label>Nom<br><input type="text" name="nom" required style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);"></label><br><br>
+            <label>Service<br>
+              <select name="service" required style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);">
+                <option value="maintenance">Maintenance</option>
+                <option value="installation">Installation système</option>
+                <option value="cybersecurite">Cybersécurité</option>
+                <option value="reseau">Réseau</option>
+                <option value="devweb">Développement web</option>
+                <option value="vetements">Vêtements</option>
+              </select>
+            </label><br><br>
+            <label>Détails<br><textarea name="details" rows="4" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);" placeholder="Décrivez votre besoin..."></textarea></label><br><br>
+            <button class="btn" type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="socials">
+        <!-- VRAIES ICÔNES Font Awesome -->
+        <a href="https://www.instagram.com/daniel_test_0?igsh=ejZiODlnZmZpeXps&utm_source=qr" aria-label="Instagram" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://discord.gg/nEbpmrpyw" aria-label="Discord" target="_blank">
+          <i class="fab fa-discord"></i>
+        </a>
+        <a href="https://www.tiktok.com/@daniel_test_yt?_r=1" aria-label="TikTok" target="_blank">
+          <i class="fab fa-tiktok"></i>
+        </a>
+        <a href="https://snapchat.com/t/iUXxzuT8" aria-label="Snapchat" target="_blank">
+          <i class="fab fa-snapchat"></i>
+        </a>
+        <a href="https://wa.me/241074085772" aria-label="WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </div>
+      <p style="margin-top:14px; color: var(--muted); text-align: center;">©ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025</p>
+    </div>
+  </footer>
+
+  <script>
+    // Menu mobile
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      const menu = document.getElementById('mainMenu');
+      menu.classList.toggle('active');
+    });
+
+    // Fermer le menu en cliquant sur un lien
+    document.querySelectorAll('.menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mainMenu').classList.remove('active');
+      });
+    });
+
+    // WhatsApp functions
+    const PHONE = '241074085772';
+    function openWhatsApp(message = 'Bonjour ROYAL TECH, je souhaite commander.') {
+      const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
+
+    // Bouton commande -> WhatsApp
+    document.getElementById('btn-commande').addEventListener('click', () => openWhatsApp());
+    document.getElementById('btn-whatsapp').addEventListener('click', (e) => {
+      e.preventDefault();
+      openWhatsApp('Salut, j\'ai une question sur vos services.');
+    });
+
+    // Formulaire devis
+    document.getElementById('devis-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      openWhatsApp(`Demande de devis — Nom: ${data.nom}, Service: ${data.service}, Détails: ${data.details}`);
+      e.target.reset();
+      alert('Votre demande de devis a été envoyée avec succès! Nous vous répondrons rapidement sur WhatsApp.');
+    });
+  </script>
+</body>
+</html>
