@@ -6,283 +6,782 @@
   <title>ROYAL TECH — Solutions informatiques & développement</title>
   <meta name="description" content="Maintenance informatique, installation de systèmes, développement web & apps, réseaux, vente de logiciels et clés d'activation. H24.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Icônes Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     :root {
       --bg: #0b0f1a;
-      --card: rgba(255,255,255,0.08);
-      --glass: rgba(255,255,255,0.12);
+      --bg-dark: #070a14;
+      --card: rgba(20, 25, 40, 0.8);
+      --glass: rgba(255, 255, 255, 0.15);
       --text: #e8f1ff;
       --muted: #a7b4c6;
       --accent: #5ce1e6;
       --accent2: #b367ff;
-      --danger: #ff5470;
+      --accent3: #ff5470;
+      --success: #4dffb4;
     }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; scroll-behavior: smooth; }
-    a { color: var(--accent); text-decoration: none; }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    html, body { 
+      background: var(--bg); 
+      color: var(--text); 
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif; 
+      scroll-behavior: smooth; 
+      overflow-x: hidden;
+    }
+    
+    a { 
+      color: var(--accent); 
+      text-decoration: none; 
+      transition: all 0.3s ease; 
+    }
+    
+    /* Animation d'entrée */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Three.js Container */
+    #three-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      pointer-events: none;
+    }
     
     /* Layout */
     header {
-      position: sticky; top: 0; z-index: 1000;
-      backdrop-filter: saturate(180%) blur(10px);
-      background: linear-gradient(0deg, rgba(11,15,26,0.4), rgba(11,15,26,0.7));
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      backdrop-filter: saturate(180%) blur(15px);
+      background: rgba(11, 15, 26, 0.85);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    header.scrolled {
+      padding: 5px 0;
+      background: rgba(11, 15, 26, 0.95);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 0 20px; 
+    }
+    
     .nav {
-      display: flex; align-items: center; justify-content: flex-start; padding: 14px 0;
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 18px 0;
+      transition: all 0.4s ease;
     }
+    
     .brand { 
-      display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: 0.5px; 
-      margin-right: auto;
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      font-weight: 800; 
+      letter-spacing: 1px; 
+      font-size: 1.3rem;
+      position: relative;
+      z-index: 1001;
     }
+    
     .brand .logo {
-      width: 34px; height: 34px; border-radius: 10px;
-      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
-      box-shadow: 0 0 20px var(--accent), inset 0 0 10px rgba(255,255,255,0.15);
-      transform: rotate(8deg);
+      width: 42px; 
+      height: 42px; 
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      box-shadow: 0 0 25px var(--accent), inset 0 0 15px rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
-    .menu { display: flex; gap: 18px; margin-left: 40px; }
-    .menu a { padding: 8px 12px; border-radius: 10px; color: var(--text); transition: all 0.3s ease; }
-    .menu a:hover { background: var(--glass); transform: translateY(-2px); }
-    .menu-toggle { display: none; background: none; border: 1px solid rgba(255,255,255,0.18); color: var(--text); padding: 6px 10px; border-radius: 8px; }
-
-    /* Hero avec vidéo de fond CORRIGÉE */
+    
+    .logo-inner {
+      width: 18px;
+      height: 18px;
+      background: white;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .menu { 
+      display: flex; 
+      gap: 25px; 
+    }
+    
+    .menu a { 
+      padding: 8px 16px; 
+      border-radius: 12px; 
+      color: var(--text); 
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .menu a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(92, 225, 230, 0.2), transparent);
+      transition: left 0.7s ease;
+    }
+    
+    .menu a:hover::before {
+      left: 100%;
+    }
+    
+    .menu a:hover { 
+      color: var(--accent); 
+      transform: translateY(-2px); 
+    }
+    
+    .menu-toggle { 
+      display: none; 
+      background: none; 
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      color: var(--text); 
+      padding: 8px 12px; 
+      border-radius: 10px; 
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    
+    /* Hero avec vidéo de fond interactive */
     .hero {
-      position: relative; overflow: hidden;
-      padding: 120px 0 80px;
-      min-height: 80vh;
+      position: relative;
+      overflow: hidden;
+      padding: 180px 0 120px;
+      min-height: 100vh;
       display: flex;
       align-items: center;
     }
+    
     .hero-video-bg {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: cover;
-      z-index: -1;
-      opacity: 0.3;
-    }
-    .hero::before {
-      content: '';
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(45deg, rgba(11,15,26,0.9), rgba(92,225,230,0.1));
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.2;
+      filter: brightness(0.7) contrast(1.2);
+    }
+    
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(11, 15, 26, 0.9) 0%, rgba(92, 225, 230, 0.15) 50%, rgba(11, 15, 26, 0.9) 100%);
       z-index: -1;
     }
+    
     .hero-grid {
-      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 30px; align-items: center;
-      perspective: 1000px;
-    }
-    .card-3d {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 18px; padding: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,255,255,0.04);
-      transform: rotateY(-6deg) translateZ(20px);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      backdrop-filter: blur(10px);
-    }
-    .card-3d:hover { transform: rotateY(0deg) translateZ(30px); box-shadow: 0 30px 70px rgba(0,0,0,0.6); }
-    .hero h1 { margin: 0 0 10px; font-size: 2.4rem; text-shadow: 0 6px 24px rgba(92,225,230,0.3); }
-    .hero p { color: var(--muted); margin: 0 0 18px; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #081018; font-weight: 700; border: none; border-radius: 12px; padding: 10px 16px; cursor: pointer;
-      box-shadow: 0 12px 30px rgba(92,225,230,0.3), 0 6px 18px rgba(179,103,255,0.25);
-      transition: all 0.3s ease;
-    }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(92,225,230,0.4); }
-    .btn.secondary { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.16); }
-
-    /* Sections Vidéos RESPONSIVES */
-    .video-section {
-      padding: 80px 0;
-      background: rgba(0,0,0,0.2);
-    }
-    .video-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 50px; 
       align-items: center;
     }
-    .video-container.reverse {
-      direction: rtl;
+    
+    .hero-content {
+      animation: fadeInUp 1s ease 0.2s both;
     }
-    .video-container.reverse > * {
-      direction: ltr;
+    
+    .hero h1 {
+      margin: 0 0 20px; 
+      font-size: 3.2rem; 
+      line-height: 1.2;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), var(--success));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 8s ease infinite;
+      text-shadow: 0 10px 30px rgba(92, 225, 230, 0.3);
     }
-    .video-wrapper {
+    
+    .hero p { 
+      color: var(--muted); 
+      margin: 0 0 30px; 
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      display: inline-flex; 
+      align-items: center; 
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #081018; 
+      font-weight: 600; 
+      border: none; 
+      border-radius: 15px; 
+      padding: 14px 28px; 
+      cursor: pointer;
+      box-shadow: 0 15px 35px rgba(92, 225, 230, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      font-size: 1rem;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.7s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover { 
+      transform: translateY(-5px) scale(1.05); 
+      box-shadow: 0 20px 40px rgba(92, 225, 230, 0.4);
+    }
+    
+    .btn.secondary { 
+      background: transparent; 
+      color: var(--text); 
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+    }
+    
+    /* Sections avec grilles CSS avancées */
+    .section-title {
+      font-size: 2.5rem; 
+      margin: 0 0 40px; 
+      font-weight: 800;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+    }
+    
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .video-card {
+      background: var(--card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s ease;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .video-card:hover {
+      transform: translateY(-15px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(92, 225, 230, 0.2);
+      border-color: rgba(92, 225, 230, 0.3);
+    }
+    
+    .video-thumbnail {
       position: relative;
       width: 100%;
-      border-radius: 18px;
+      height: 250px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      transform: perspective(1000px) rotateY(-5deg);
-      transition: transform 0.4s ease;
     }
-    .video-wrapper:hover {
-      transform: perspective(1000px) rotateY(0deg);
-    }
-    /* Vidéos responsives */
-    .video-wrapper video {
+    
+    .video-thumbnail video {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
     }
+    
+    .video-card:hover .video-thumbnail video {
+      transform: scale(1.1);
+    }
+    
+    .video-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.8rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .video-card:hover .video-play-btn {
+      opacity: 1;
+    }
+    
     .video-content {
-      padding: 20px;
+      padding: 25px;
     }
-    .video-content h3 {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: var(--accent);
+    
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
     }
-
-    /* Sections */
-    section { padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-    .section-title { font-size: 1.8rem; margin: 0 0 25px; }
-    .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
-    .card {
-      background: var(--card); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 18px; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    .service-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
     }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.45); }
-    .badge { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 999px; background: rgba(92,225,230,0.18); color: var(--accent); border: 1px solid rgba(92,225,230,0.3); }
-
-    /* Contact + commande */
-    .contact {
-      display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px;
+    
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      transition: width 0.4s ease;
     }
-    .contact .cta { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px; }
-    .contact .cta .phone { font-size: 1.4rem; font-weight: 700; }
-    .contact .cta .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
-
-    /* Section Vêtements simplifiée */
-    .clothing-section {
-      background: linear-gradient(135deg, rgba(92,225,230,0.1), rgba(179,103,255,0.1));
-      padding: 40px 0;
-      text-align: center;
+    
+    .service-card:hover::before {
+      width: 100%;
+      opacity: 0.1;
     }
-    .clothing-content {
-      max-width: 600px;
-      margin: 0 auto;
+    
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      border-color: rgba(92, 225, 230, 0.3);
     }
-    .phone-link {
-      display: inline-block;
-      background: var(--accent);
-      color: #081018;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-weight: 600;
-      margin: 15px 0;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(92,225,230,0.3);
-    }
-    .phone-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(92,225,230,0.5);
-    }
-
-    /* Footer */
-    footer { padding: 36px 0 20px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.1); }
-    .socials { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-    .socials a {
-      width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 10px; background: var(--glass); border: 1px solid rgba(255,255,255,0.14);
-      transition: all 0.3s ease;
-    }
-    .socials a:hover { transform: translateY(-4px) scale(1.1); background: rgba(92,225,230,0.2); }
-
-    /* Bouton WhatsApp flottant AMÉLIORÉ */
-    .whatsapp-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+    
+    .service-icon {
       width: 60px;
       height: 60px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: white;
+    }
+    
+    /* Section à propos avec timeline */
+    .timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 50px auto 0;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 50px;
+      width: 45%;
+    }
+    
+    .timeline-item:nth-child(odd) {
+      left: 0;
+    }
+    
+    .timeline-item:nth-child(even) {
+      left: 55%;
+    }
+    
+    .timeline-dot {
+      position: absolute;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 15px var(--accent);
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-dot {
+      right: -52px;
+    }
+    
+    .timeline-item:nth-child(even) .timeline-dot {
+      left: -52px;
+    }
+    
+    /* Statistiques interactives */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 60px 0;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent);
+    }
+    
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    /* Contact avec carte interactive */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 40px;
+    }
+    
+    .contact-form {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.2);
+    }
+    
+    /* Bouton WhatsApp flottant amélioré */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
       background: #25D366;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+      box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
       z-index: 1000;
-      transition: all 0.3s ease;
-      animation: pulse 2s infinite;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: pulse 2s infinite, float 5s ease-in-out infinite;
     }
+    
     .whatsapp-float:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7);
+      transform: scale(1.15) rotate(10deg);
+      box-shadow: 0 15px 35px rgba(37, 211, 102, 0.6);
     }
-    @keyframes pulse {
-      0% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5); }
-      50% { box-shadow: 0 4px 25px rgba(37, 211, 102, 0.8); }
-      100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5); }
-    }
+    
     .whatsapp-float i {
-      font-size: 30px;
+      font-size: 34px;
       color: white;
     }
-
-    /* Responsive AMÉLIORÉ */
-    @media (max-width: 960px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .grid { grid-template-columns: 1fr 1fr; }
-      .contact { grid-template-columns: 1fr; }
-      .video-container { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 2rem; }
+    
+    /* Footer */
+    footer { 
+      padding: 60px 0 30px; 
+      background: rgba(7, 10, 20, 0.9); 
+      border-top: 1px solid rgba(255, 255, 255, 0.1); 
+      position: relative;
+      overflow: hidden;
     }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .socials { 
+      display: flex; 
+      gap: 15px; 
+      flex-wrap: wrap; 
+    }
+    
+    .socials a {
+      width: 50px; 
+      height: 50px; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center;
+      border-radius: 15px; 
+      background: rgba(255, 255, 255, 0.05); 
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+    
+    .socials a:hover { 
+      transform: translateY(-5px) scale(1.1); 
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border-color: transparent;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 40px;
+      }
+      
+      .timeline::before {
+        left: 30px;
+      }
+      
+      .timeline-item {
+        width: 100%;
+        left: 0 !important;
+        padding-left: 70px;
+      }
+      
+      .timeline-item:nth-child(odd) .timeline-dot,
+      .timeline-item:nth-child(even) .timeline-dot {
+        left: 20px;
+      }
+    }
+    
     @media (max-width: 768px) {
       .menu { 
         display: none; 
-        position: absolute; top: 100%; left: 0; width: 100%; 
-        background: var(--bg); flex-direction: column; padding: 20px;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100vh;
+        background: rgba(11, 15, 26, 0.98); 
+        flex-direction: column; 
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        backdrop-filter: blur(15px);
+        z-index: 1000;
       }
-      .menu.active { display: flex; }
-      .menu-toggle { display: inline-block; }
-      .grid { grid-template-columns: 1fr; }
-      .nav { justify-content: space-between; }
-      .brand { margin-right: 0; }
-      .hero { padding: 100px 0 60px; min-height: 60vh; }
-      .hero h1 { font-size: 1.8rem; }
-      .section-title { font-size: 1.5rem; }
-      .video-wrapper {
-        transform: none; /* Supprime l'effet 3D sur mobile */
+      
+      .menu.active { 
+        display: flex; 
+      }
+      
+      .menu-toggle { 
+        display: block; 
+      }
+      
+      .hero {
+        padding: 150px 0 80px;
+      }
+      
+      .hero h1 {
+        font-size: 2.3rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .nav {
+        padding: 15px 0;
       }
     }
-    @media (max-width: 480px) {
-      .container { padding: 0 15px; }
-      .hero { padding: 80px 0 40px; }
-      .btn { padding: 8px 14px; font-size: 0.9rem; }
-      .card-3d { padding: 18px; }
+    
+    @media (max-width: 576px) {
+      .container {
+        padding: 0 15px;
+      }
+      
+      .hero h1 {
+        font-size: 1.9rem;
+      }
+      
+      .btn {
+        padding: 12px 24px;
+      }
+      
+      .service-card, .video-card, .contact-form {
+        padding: 25px;
+      }
+      
+      .whatsapp-float {
+        width: 60px;
+        height: 60px;
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .whatsapp-float i {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Bouton WhatsApp flottant AVEC VRAIE ICÔNE -->
+  <!-- Canvas Three.js -->
+  <div id="three-canvas"></div>
+
+  <!-- Bouton WhatsApp flottant -->
   <a href="https://wa.me/241074085772" class="whatsapp-float" target="_blank" aria-label="Contact WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
-  <header>
+  <header id="mainHeader">
     <div class="container nav">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo">
+          <div class="logo-inner"></div>
+        </div>
         <span>ROYAL TECH</span>
       </div>
       <nav class="menu" id="mainMenu">
@@ -290,33 +789,48 @@
         <a href="#services">Nos services</a>
         <a href="#videos">Nos réalisations</a>
         <a href="#apropos">À propos</a>
+        <a href="#statistiques">Chiffres</a>
         <a href="#contact">Contact</a>
       </nav>
-      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
   </header>
 
   <main>
-    <!-- Accueil avec vidéo  -->
+    <!-- Accueil avec vidéo de fond -->
     <section id="accueil" class="hero">
       <video class="hero-video-bg" autoplay muted loop playsinline>
         <source src="2.mp4" type="video/mp4">
-     
       </video>
+      <div class="hero-overlay"></div>
       <div class="container hero-grid">
-        <div class="card-3d">
-          <h1>Bienvenue dans le Service la ROYAL TECH</h1>
-          <p>Votre partenaire de confiance pour toutes vos solutions informatiques. Maintenance, installation système, cybersécurité, développement web et bien plus encore.</p>
-          <div>
-            <button class="btn" id="btn-commande">Commander maintenant</button>
-            <a class="btn secondary" href="#services">Découvrir nos services</a>
+        <div class="hero-content">
+          <h1>Solutions Informatiques Professionnelles ROYAL TECH</h1>
+          <p>Votre partenaire de confiance pour toutes vos solutions informatiques. Maintenance, cybersécurité, développement web et bien plus encore. Service disponible 24h/24.</p>
+          <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
+            <button class="btn" id="btn-commande">
+              <i class="fas fa-rocket"></i> Commander maintenant
+            </button>
+            <a class="btn secondary" href="#services">
+              <i class="fas fa-search"></i> Découvrir nos services
+            </a>
           </div>
         </div>
-        <div class="video-wrapper">
-          <video controls poster="poster.jpg"autoplay muted loop playsinline>
-            <source src="1.mp4" type="video/mp4" />
-            
-          </video>
+        <div class="video-card animate-on-scroll">
+          <div class="video-thumbnail">
+            <video autoplay muted loop playsinline>
+              <source src="1.mp4" type="video/mp4" />
+            </video>
+            <div class="video-play-btn">
+              <i class="fas fa-play"></i>
+            </div>
+          </div>
+          <div class="video-content">
+            <h3>Présentation ROYAL TECH</h3>
+            <p>Découvrez notre expertise et notre approche professionnelle en action.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -324,108 +838,158 @@
     <!-- Nos services -->
     <section id="services">
       <div class="container">
-        <h2 class="section-title">Nos services</h2>
-        <div class="grid">
-          <div class="card">
-            <span class="badge">H24</span>
-            <h3>Maintenance informatique</h3>
-            <p>Diagnostic, nettoyage, hardware & software, sécurité, sauvegardes.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20maintenance%20informatique" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+        <h2 class="section-title animate-on-scroll">Nos services</h2>
+        <div class="services-grid">
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+            <h3>Maintenance informatique H24</h3>
+            <p>Diagnostic complet, nettoyage hardware & software, optimisation des performances et sécurité avancée.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20maintenance%20informatique" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
-          <div class="card">
+          
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
             <h3>Installation de systèmes</h3>
-            <p>Windows, Linux, macOS, drivers, partitionnement, configuration.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20une%20installation%20de%20système" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+            <p>Windows, Linux, macOS avec drivers optimisés, partitionnement intelligent et configuration complète.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20une%20installation%20de%20système" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
-          <div class="card">
+          
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
             <h3>Cybersécurité</h3>
-            <p>Protection des données, antivirus, firewall, sécurisation réseau.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20cybersécurité" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+            <p>Protection des données, antivirus professionnels, firewall avancé et sécurisation réseau complète.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20de%20cybersécurité" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
-          <div class="card">
+          
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-code"></i>
+            </div>
             <h3>Développement web</h3>
-            <p>Sites vitrines, e-commerce, SEO, performance, hébergement.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20développement%20web" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+            <p>Sites vitrines, e-commerce, applications web, SEO et hébergement professionnel haute performance.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20développement%20web" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
-          <div class="card">
+          
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-network-wired"></i>
+            </div>
             <h3>Réseau informatique</h3>
-            <p>Routeurs, câblage, Wi-Fi pro, VPN, sécurité réseau.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20réseau" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+            <p>Routeurs professionnels, câblage structuré, Wi-Fi haute densité, VPN et sécurité réseau avancée.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20service%20réseau" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
-          <div class="card">
-            <h3>Support technique</h3>
-            <p>Assistance à distance, dépannage, formation utilisateur.</p>
-            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20support%20technique" class="btn" style="margin-top: 10px; padding: 8px 12px; font-size: 0.9rem;">Contact WhatsApp</a>
+          
+          <div class="service-card animate-on-scroll">
+            <div class="service-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h3>Support technique premium</h3>
+            <p>Assistance à distance, dépannage urgent, formation utilisateur et suivi personnalisé.</p>
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20souhaite%20un%20support%20technique" class="btn" style="margin-top: 20px; padding: 10px 20px; font-size: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Demander un devis
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Sections Vidéos RESPONSIVES -->
+    <!-- Sections Vidéos -->
     <section id="videos" class="video-section">
       <div class="container">
-        <h2 class="section-title">Nos Réalisations</h2>
+        <h2 class="section-title animate-on-scroll">Nos Réalisations</h2>
         
-        <!-- Vidéo 1: Maintenance informatique -->
-        <div class="video-container">
-          <div class="video-wrapper">
-            <video controls poster="videos/maintenance-poster.jpg"autoplay muted loop playsinline>
-              <source src="3.mp4" type="video/mp4" />
-             
-            </video>
+        <div class="video-grid">
+          <div class="video-card animate-on-scroll">
+            <div class="video-thumbnail">
+              <video autoplay muted loop playsinline>
+                <source src="3.mp4" type="video/mp4" />
+              </video>
+              <div class="video-play-btn">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+            <div class="video-content">
+              <h3>Maintenance Professionnelle</h3>
+              <p>Processus complet de maintenance informatique avec diagnostics avancés et optimisation système.</p>
+            </div>
           </div>
-          <div class="video-content">
-            <h3>Maintenance Informatique Professionnelle</h3>
-            <p>Découvrez notre processus complet de maintenance informatique : diagnostic approfondi, nettoyage matériel, optimisation logicielle et sécurisation de votre système. Nos techniciens certifiés interviennent rapidement pour garantir la performance et la longévité de votre équipement.</p>
-            <ul>
-              <li>Diagnostic complet et gratuit</li>
-              <li>Nettoyage physique et logiciel</li>
-              <li>Optimisation des performances</li>
-              <li>Sécurisation antivirus et firewall</li>
-              <li>Sauvegarde et récupération de données</li>
-            </ul>
+          
+          <div class="video-card animate-on-scroll">
+            <div class="video-thumbnail">
+              <video autoplay muted loop playsinline>
+                <source src="4.mp4" type="video/mp4" />
+              </video>
+              <div class="video-play-btn">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+            <div class="video-content">
+              <h3>Installation Système</h3>
+              <p>Installation optimisée de Windows, Linux et macOS avec configuration professionnelle.</p>
+            </div>
+          </div>
+          
+          <div class="video-card animate-on-scroll">
+            <div class="video-thumbnail">
+              <video autoplay muted loop playsinline>
+                <source src="2.mp4" type="video/mp4" />
+              </video>
+              <div class="video-play-btn">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+            <div class="video-content">
+              <h3>Solutions Cybersécurité</h3>
+              <p>Protection avancée des données et sécurisation complète des systèmes informatiques.</p>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Vidéo 2: Installation système -->
-        <div class="video-container reverse" style="margin-top: 60px;">
-          <div class="video-wrapper">
-            <video controls poster="videos/installation-poster.jpg"autoplay muted loop playsinline>
-              <source src="4.mp4" type="video/mp4" />
-             
-            </video>
+    <!-- Statistiques -->
+    <section id="statistiques">
+      <div class="container">
+        <h2 class="section-title animate-on-scroll">ROYAL TECH en chiffres</h2>
+        <div class="stats-grid">
+          <div class="stat-card animate-on-scroll">
+            <div class="stat-number" data-count="150">0</div>
+            <h3>Clients satisfaits</h3>
+            <p>Professionnels et particuliers</p>
           </div>
-          <div class="video-content">
-            <h3>Installation de Systèmes d'Exploitation</h3>
-            <p>Installation professionnelle de Windows, Linux et macOS avec configuration optimale. Nous assurons l'installation des drivers, la mise à jour du système et la configuration de vos logiciels essentiels pour une expérience utilisateur fluide et sécurisée.</p>
-            <ul>
-              <li>Installation Windows, Linux, macOS</li>
-              <li>Drivers et mises à jour inclus</li>
-              <li>Partitionnement personnalisé</li>
-              <li>Configuration optimale</li>
-              <li>Formation utilisateur incluse</li>
-            </ul>
+          
+          <div class="stat-card animate-on-scroll">
+            <div class="stat-number" data-count="24">0</div>
+            <h3>Support H24</h3>
+            <p>Disponibilité permanente</p>
           </div>
-        </div>
-
-        <!-- Vidéo 3: Cybersécurité -->
-        <div class="video-container" style="margin-top: 60px;">
-          <div class="video-wrapper">
-            <video controls poster="videos/cybersecurite-poster.jpg" autoplay muted loop playsinline>
-              <source src="2.mp4" type="video/mp4" />
-              
-            </video>
+          
+          <div class="stat-card animate-on-scroll">
+            <div class="stat-number" data-count="50">0</div>
+            <h3>Projets réalisés</h3>
+            <p>Solutions sur mesure</p>
           </div>
-          <div class="video-content">
-            <h3>Solutions de Cybersécurité</h3>
-            <p>Protégez vos données et votre vie privée avec nos solutions de cybersécurité avancées. Installation d'antivirus professionnels, configuration de firewalls, sécurisation réseau et formation aux bonnes pratiques de sécurité numérique.</p>
-            <ul>
-              <li>Antivirus et anti-malware</li>
-              <li>Firewall et protection réseau</li>
-              <li>Chiffrement des données</li>
-              <li>Audit de sécurité</li>
-              <li>Formation utilisateur</li>
-            </ul>
+          
+          <div class="stat-card animate-on-scroll">
+            <div class="stat-number" data-count="3">0</div>
+            <h3>Ans d'expérience</h3>
+            <p>Expertise confirmée</p>
           </div>
         </div>
       </div>
@@ -434,67 +998,143 @@
     <!-- À propos -->
     <section id="apropos">
       <div class="container">
-        <h2 class="section-title">À propos de nous</h2>
-        <div class="card">
+        <h2 class="section-title animate-on-scroll">À propos de ROYAL TECH</h2>
+        <div class="service-card animate-on-scroll" style="max-width: 900px; margin: 0 auto;">
           <p><strong>ROYAL TECH</strong> est votre partenaire de confiance pour toutes vos solutions informatiques. Forts de plusieurs années d'expérience, nous accompagnons particuliers et professionnels dans la maintenance, l'installation et la sécurisation de leurs systèmes informatiques.</p>
           <p><strong>Notre mission :</strong> Vous offrir des services de qualité, rapides et fiables, avec un support disponible 24h/24. Nous nous engageons à vous fournir des solutions adaptées à vos besoins spécifiques.</p>
           <p><strong>Nos valeurs :</strong> Professionnalisme, réactivité, expertise et satisfaction client.</p>
-          <p style="margin-top: 20px; text-align: center; font-style: italic;">© ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025</p>
+          
+          <div class="timeline">
+            <div class="timeline-item animate-on-scroll">
+              <div class="timeline-dot"></div>
+              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
+                <h4>2022 - Fondation</h4>
+                <p>Création de ROYAL TECH avec une vision innovante des services informatiques.</p>
+              </div>
+            </div>
+            
+            <div class="timeline-item animate-on-scroll">
+              <div class="timeline-dot"></div>
+              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
+                <h4>2023 - Expansion</h4>
+                <p>Élargissement de nos services et développement de partenariats stratégiques.</p>
+              </div>
+            </div>
+            
+            <div class="timeline-item animate-on-scroll">
+              <div class="timeline-dot"></div>
+              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
+                <h4>2024 - Innovation</h4>
+                <p>Intégration de solutions de cybersécurité avancées et développement d'applications web.</p>
+              </div>
+            </div>
+            
+            <div class="timeline-item animate-on-scroll">
+              <div class="timeline-dot"></div>
+              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
+                <h4>2025 - Excellence</h4>
+                <p>Service premium H24 et développement de la collection vêtements ROYAL TECH.</p>
+              </div>
+            </div>
+          </div>
+          
+          <p style="margin-top: 40px; text-align: center; font-style: italic; font-size: 1.1rem;">© ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025</p>
         </div>
       </div>
     </section>
 
-    <!-- Section Vêtements simplifiée -->
-    <section class="clothing-section">
-      <div class="container clothing-content">
-        <h2>Collection Vêtements ROYAL TECH</h2>
-        <p>Découvrez notre collection exclusive de vêtements aux couleurs de ROYAL TECH. T-shirts, sweats et accessoires de qualité.</p>
-        <p><strong>Contactez-nous pour découvrir notre catalogue et passer commande !</strong></p>
-        
-        <!-- Numéro -->
-        <a href="tel:+241074085772" class="phone-link">
-          <i class="fas fa-phone"></i> Appelez-nous: +241 07 40 85 772
-        </a>
-        
-        <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20suis%20intéressé%20par%20votre%20collection%20de%20vêtements" class="btn" style="margin-top: 15px;">
-          <i class="fab fa-whatsapp"></i> Voir le catalogue WhatsApp
-        </a>
-      </div>
-    </section>
-
-    <!-- Contact / Service H24 -->
-    <section id="contact">
-      <div class="container contact">
-        <div class="cta">
-          <h2 class="section-title">Service H24</h2>
-          <p class="phone">Téléphone: <a href="tel:+241074085772" style="color: var(--accent);">+241 07 40 85 772</a></p>
-          <div class="actions">
-            <a class="btn" id="btn-whatsapp" href="https://wa.me/241074085772">
-              <i class="fab fa-whatsapp"></i> WhatsApp
+    <!-- Section Vêtements -->
+    <section class="clothing-section" style="background: linear-gradient(135deg, rgba(92,225,230,0.15), rgba(179,103,255,0.15)); padding: 80px 0;">
+      <div class="container">
+        <div class="service-card animate-on-scroll" style="max-width: 800px; margin: 0 auto; text-align: center;">
+          <div class="service-icon" style="margin: 0 auto 25px;">
+            <i class="fas fa-tshirt"></i>
+          </div>
+          <h2>Collection Vêtements ROYAL TECH</h2>
+          <p style="font-size: 1.1rem;">Découvrez notre collection exclusive de vêtements aux couleurs de ROYAL TECH. T-shirts, sweats et accessoires de qualité professionnelle.</p>
+          <p style="margin: 20px 0; font-weight: 600;"><strong>Contactez-nous pour découvrir notre catalogue et passer commande !</strong></p>
+          
+          <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px;">
+            <a href="tel:+241074085772" class="btn" style="background: linear-gradient(135deg, var(--accent3), #ff8a9e);">
+              <i class="fas fa-phone"></i> Appeler: +241 07 40 85 772
             </a>
-            <a class="btn secondary" href="mailto:contact@royaltech.ga">
-              <i class="fas fa-envelope"></i> Email
+            
+            <a href="https://wa.me/241074085772?text=Bonjour%20ROYAL%20TECH,%20je%20suis%20intéressé%20par%20votre%20collection%20de%20vêtements" class="btn secondary">
+              <i class="fab fa-whatsapp"></i> Catalogue WhatsApp
             </a>
           </div>
-          <p style="color: var(--muted); margin-top: 15px;">Cliquez pour commander directement. Réponse rapide garantie.</p>
         </div>
-        <div class="cta">
-          <h3>Demander un devis</h3>
-          <form id="devis-form">
-            <label>Nom<br><input type="text" name="nom" required style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);"></label><br><br>
-            <label>Service<br>
-              <select name="service" required style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);">
-                <option value="maintenance">Maintenance</option>
-                <option value="installation">Installation système</option>
-                <option value="cybersecurite">Cybersécurité</option>
-                <option value="reseau">Réseau</option>
-                <option value="devweb">Développement web</option>
-                <option value="vetements">Vêtements</option>
-              </select>
-            </label><br><br>
-            <label>Détails<br><textarea name="details" rows="4" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1);" placeholder="Décrivez votre besoin..."></textarea></label><br><br>
-            <button class="btn" type="submit">Envoyer</button>
-          </form>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+      <div class="container">
+        <h2 class="section-title animate-on-scroll">Contactez-nous</h2>
+        <div class="contact-grid">
+          <div class="contact-form animate-on-scroll">
+            <h3>Demander un devis</h3>
+            <form id="devis-form">
+              <div class="form-group">
+                <label class="form-label">Nom complet</label>
+                <input type="text" name="nom" class="form-input" required placeholder="Votre nom">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-input" required placeholder="votre@email.com">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Service souhaité</label>
+                <select name="service" class="form-select" required>
+                  <option value="">Sélectionnez un service</option>
+                  <option value="maintenance">Maintenance informatique</option>
+                  <option value="installation">Installation système</option>
+                  <option value="cybersecurite">Cybersécurité</option>
+                  <option value="reseau">Réseau informatique</option>
+                  <option value="devweb">Développement web</option>
+                  <option value="vetements">Vêtements ROYAL TECH</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Détails de votre demande</label>
+                <textarea name="details" class="form-textarea" rows="5" placeholder="Décrivez votre projet ou besoin..."></textarea>
+              </div>
+              
+              <button class="btn" type="submit" style="width: 100%;">
+                <i class="fas fa-paper-plane"></i> Envoyer la demande
+              </button>
+            </form>
+          </div>
+          
+          <div class="animate-on-scroll">
+            <div class="service-card" style="height: 100%;">
+              <h3>Service Client H24</h3>
+              <div style="margin: 30px 0;">
+                <div class="service-icon" style="margin: 0 auto 20px; width: 80px; height: 80px;">
+                  <i class="fas fa-headset"></i>
+                </div>
+                <p class="phone" style="font-size: 1.8rem; font-weight: 700; text-align: center; margin: 20px 0;">
+                  <a href="tel:+241074085772" style="color: var(--accent);">+241 07 40 85 772</a>
+                </p>
+              </div>
+              
+              <div class="actions" style="display: flex; flex-direction: column; gap: 15px;">
+                <a class="btn" id="btn-whatsapp" href="https://wa.me/241074085772" style="text-align: center;">
+                  <i class="fab fa-whatsapp"></i> WhatsApp Direct
+                </a>
+                <a class="btn secondary" href="mailto:contact@royaltech.ga" style="text-align: center;">
+                  <i class="fas fa-envelope"></i> Email Professionnel
+                </a>
+              </div>
+              
+              <p style="color: var(--muted); margin-top: 25px; text-align: center; font-size: 0.9rem;">
+                <i class="fas fa-bolt"></i> Réponse garantie en moins de 15 minutes
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -502,64 +1142,288 @@
 
   <footer>
     <div class="container">
-      <div class="socials">
-        <!-- VRAIES ICÔNES Font Awesome -->
-        <a href="https://www.instagram.com/daniel_test_0?igsh=ejZiODlnZmZpeXps&utm_source=qr" aria-label="Instagram" target="_blank">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://discord.gg/nEbpmrpyw" aria-label="Discord" target="_blank">
-          <i class="fab fa-discord"></i>
-        </a>
-        <a href="https://www.tiktok.com/@daniel_test_yt?_r=1" aria-label="TikTok" target="_blank">
-          <i class="fab fa-tiktok"></i>
-        </a>
-        <a href="https://snapchat.com/t/iUXxzuT8" aria-label="Snapchat" target="_blank">
-          <i class="fab fa-snapchat"></i>
-        </a>
-        <a href="https://wa.me/241074085772" aria-label="WhatsApp">
-          <i class="fab fa-whatsapp"></i>
-        </a>
+      <div class="footer-grid">
+        <div>
+          <div class="brand" style="margin-bottom: 20px;">
+            <div class="logo">
+              <div class="logo-inner"></div>
+            </div>
+            <span style="font-size: 1.5rem;">ROYAL TECH</span>
+          </div>
+          <p>Solutions informatiques professionnelles disponibles 24h/24. Votre partenaire de confiance pour tous vos projets technologiques.</p>
+        </div>
+        
+        <div>
+          <h4>Services</h4>
+          <ul style="list-style: none; padding: 0; margin-top: 15px;">
+            <li style="margin-bottom: 10px;"><a href="#services">Maintenance informatique</a></li>
+            <li style="margin-bottom: 10px;"><a href="#services">Cybersécurité</a></li>
+            <li style="margin-bottom: 10px;"><a href="#services">Développement web</a></li>
+            <li style="margin-bottom: 10px;"><a href="#services">Installation système</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4>Contact rapide</h4>
+          <p style="margin: 15px 0;"><i class="fas fa-phone"></i> +241 07 40 85 772</p>
+          <p style="margin: 15px 0;"><i class="fas fa-clock"></i> Disponible 24h/24</p>
+          <div class="socials" style="margin-top: 20px;">
+            <a href="https://www.instagram.com/daniel_test_0?igsh=ejZiODlnZmZpeXps&utm_source=qr" aria-label="Instagram" target="_blank">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://discord.gg/nEbpmrpyw" aria-label="Discord" target="_blank">
+              <i class="fab fa-discord"></i>
+            </a>
+            <a href="https://www.tiktok.com/@daniel_test_yt?_r=1" aria-label="TikTok" target="_blank">
+              <i class="fab fa-tiktok"></i>
+            </a>
+            <a href="https://snapchat.com/t/iUXxzuT8" aria-label="Snapchat" target="_blank">
+              <i class="fab fa-snapchat"></i>
+            </a>
+            <a href="https://wa.me/241074085772" aria-label="WhatsApp">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
       </div>
-      <p style="margin-top:14px; color: var(--muted); text-align: center;">©ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025</p>
+      
+      <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p style="color: var(--muted);">© ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025. Tous droits réservés.</p>
+      </div>
     </div>
   </footer>
 
   <script>
+    // Three.js Background Animation
+    function initThreeJS() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ 
+        alpha: true, 
+        antialias: true 
+      });
+      
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.getElementById('three-canvas').appendChild(renderer.domElement);
+      
+      // Créer des particules
+      const particlesGeometry = new THREE.BufferGeometry();
+      const count = 5000;
+      const positions = new Float32Array(count * 3);
+      
+      for(let i = 0; i < count * 3; i++) {
+        positions[i] = (Math.random() - 0.5) * 50;
+      }
+      
+      particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      
+      const particlesMaterial = new THREE.PointsMaterial({
+        size: 0.05,
+        color: 0x5ce1e6,
+        transparent: true,
+        opacity: 0.6
+      });
+      
+      const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+      scene.add(particles);
+      
+      // Ajouter des sphères
+      const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+      const sphereMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0xb367ff, 
+        wireframe: true,
+        transparent: true,
+        opacity: 0.3
+      });
+      
+      const spheres = [];
+      for(let i = 0; i < 5; i++) {
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.x = (Math.random() - 0.5) * 20;
+        sphere.position.y = (Math.random() - 0.5) * 20;
+        sphere.position.z = (Math.random() - 0.5) * 20;
+        sphere.scale.setScalar(Math.random() * 0.5 + 0.5);
+        spheres.push(sphere);
+        scene.add(sphere);
+      }
+      
+      camera.position.z = 15;
+      
+      // Animation
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        particles.rotation.x += 0.0005;
+        particles.rotation.y += 0.001;
+        
+        spheres.forEach((sphere, i) => {
+          sphere.rotation.x += 0.01;
+          sphere.rotation.y += 0.01;
+          sphere.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+        });
+        
+        renderer.render(scene, camera);
+      }
+      
+      animate();
+      
+      // Redimensionnement
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+    
+    // Initialiser Three.js si WebGL est supporté
+    if (WEBGL.isWebGLAvailable()) {
+      initThreeJS();
+    }
+    
     // Menu mobile
     document.getElementById('menuToggle').addEventListener('click', () => {
       const menu = document.getElementById('mainMenu');
       menu.classList.toggle('active');
+      document.getElementById('menuToggle').innerHTML = menu.classList.contains('active') ? 
+        '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
     });
-
+    
     // Fermer le menu en cliquant sur un lien
     document.querySelectorAll('.menu a').forEach(link => {
       link.addEventListener('click', () => {
         document.getElementById('mainMenu').classList.remove('active');
+        document.getElementById('menuToggle').innerHTML = '<i class="fas fa-bars"></i>';
       });
     });
-
+    
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('mainHeader');
+      if (window.scrollY > 100) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+    
+    // Animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          
+          // Animation des chiffres
+          if (entry.target.classList.contains('stat-number')) {
+            const finalValue = parseInt(entry.target.getAttribute('data-count'));
+            const duration = 2000;
+            const step = finalValue / (duration / 16);
+            let currentValue = 0;
+            
+            const timer = setInterval(() => {
+              currentValue += step;
+              if (currentValue >= finalValue) {
+                entry.target.textContent = finalValue + (entry.target.textContent.includes('+') ? '+' : '');
+                clearInterval(timer);
+              } else {
+                entry.target.textContent = Math.floor(currentValue) + (entry.target.textContent.includes('+') ? '+' : '');
+              }
+            }, 16);
+          }
+        }
+      });
+    }, observerOptions);
+    
+    // Observer les éléments à animer
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+    
+    // Observer les chiffres
+    document.querySelectorAll('.stat-number').forEach(el => {
+      observer.observe(el);
+    });
+    
     // WhatsApp functions
     const PHONE = '241074085772';
     function openWhatsApp(message = 'Bonjour ROYAL TECH, je souhaite commander.') {
       const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }
-
+    
     // Bouton commande -> WhatsApp
     document.getElementById('btn-commande').addEventListener('click', () => openWhatsApp());
     document.getElementById('btn-whatsapp').addEventListener('click', (e) => {
       e.preventDefault();
       openWhatsApp('Salut, j\'ai une question sur vos services.');
     });
-
+    
     // Formulaire devis
     document.getElementById('devis-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target).entries());
-      openWhatsApp(`Demande de devis — Nom: ${data.nom}, Service: ${data.service}, Détails: ${data.details}`);
+      const message = `📋 Demande de devis ROYAL TECH 📋
+      
+👤 Nom: ${data.nom}
+📧 Email: ${data.email}
+🛠 Service: ${data.service}
+📝 Détails: ${data.details}
+
+Je vous remercie de me contacter rapidement.`;
+      
+      openWhatsApp(message);
       e.target.reset();
-      alert('Votre demande de devis a été envoyée avec succès! Nous vous répondrons rapidement sur WhatsApp.');
+      
+      // Animation de confirmation
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-check"></i> Demande envoyée !';
+      submitBtn.style.background = 'linear-gradient(135deg, #4dffb4, #00cc88)';
+      
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.style.background = '';
+      }, 3000);
     });
+    
+    // Effets de souris sur les cartes vidéo
+    document.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateY = (x - centerX) / 25;
+        const rotateX = (centerY - y) / 25;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(-15px)';
+      });
+    });
+    
+    // Détection WebGL
+    const WEBGL = {
+      isWebGLAvailable: function() {
+        try {
+          const canvas = document.createElement('canvas');
+          return !!(window.WebGLRenderingContext && 
+            (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        } catch (e) {
+          return false;
+        }
+      }
+    };
   </script>
 </body>
 </html>
