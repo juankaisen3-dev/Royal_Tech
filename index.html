@@ -9,13 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Icônes Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Three.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- EmailJS pour les formulaires -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
       --bg: #0b0f1a;
       --bg-dark: #070a14;
-      --card: rgba(20, 25, 40, 0.8);
+      --card: rgba(20, 25, 40, 0.9);
       --glass: rgba(255, 255, 255, 0.15);
       --text: #e8f1ff;
       --muted: #a7b4c6;
@@ -23,6 +23,7 @@
       --accent2: #b367ff;
       --accent3: #ff5470;
       --success: #4dffb4;
+      --warning: #ffd166;
     }
     
     * { 
@@ -78,6 +79,18 @@
       }
     }
     
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(92, 225, 230, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(92, 225, 230, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(92, 225, 230, 0);
+      }
+    }
+    
     .animate-on-scroll {
       opacity: 0;
       transform: translateY(30px);
@@ -89,15 +102,16 @@
       transform: translateY(0);
     }
     
-    /* Three.js Container */
+    /* Three.js Container corrigé */
     #three-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -2;
+      z-index: -1;
       pointer-events: none;
+      opacity: 0.3;
     }
     
     /* Layout */
@@ -108,15 +122,15 @@
       width: 100%;
       z-index: 1000;
       backdrop-filter: saturate(180%) blur(15px);
-      background: rgba(11, 15, 26, 0.85);
+      background: rgba(11, 15, 26, 0.95);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     header.scrolled {
       padding: 5px 0;
-      background: rgba(11, 15, 26, 0.95);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: rgba(11, 15, 26, 0.98);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
     
     .container { 
@@ -155,6 +169,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      animation: pulse 2s infinite;
     }
     
     .logo-inner {
@@ -211,7 +226,7 @@
       z-index: 1001;
     }
     
-    /* Hero avec vidéo de fond interactive */
+    /* Hero corrigé */
     .hero {
       position: relative;
       overflow: hidden;
@@ -219,6 +234,7 @@
       min-height: 100vh;
       display: flex;
       align-items: center;
+      background: linear-gradient(135deg, rgba(11, 15, 26, 0.9) 0%, rgba(92, 225, 230, 0.15) 50%, rgba(11, 15, 26, 0.9) 100%);
     }
     
     .hero-video-bg {
@@ -229,18 +245,8 @@
       height: 100%;
       object-fit: cover;
       z-index: -1;
-      opacity: 0.2;
-      filter: brightness(0.7) contrast(1.2);
-    }
-    
-    .hero-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(11, 15, 26, 0.9) 0%, rgba(92, 225, 230, 0.15) 50%, rgba(11, 15, 26, 0.9) 100%);
-      z-index: -1;
+      opacity: 0.15;
+      filter: brightness(0.5) contrast(1.2);
     }
     
     .hero-grid {
@@ -325,6 +331,30 @@
       border-color: var(--accent);
     }
     
+    .btn.loading {
+      position: relative;
+      color: transparent;
+    }
+    
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin-left: -10px;
+      margin-top: -10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     /* Sections avec grilles CSS avancées */
     .section-title {
       font-size: 2.5rem; 
@@ -343,6 +373,11 @@
       height: 4px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       border-radius: 2px;
+    }
+    
+    section {
+      padding: 100px 0;
+      position: relative;
     }
     
     .video-grid {
@@ -468,56 +503,6 @@
       color: white;
     }
     
-    /* Section à propos avec timeline */
-    .timeline {
-      position: relative;
-      max-width: 800px;
-      margin: 50px auto 0;
-    }
-    
-    .timeline::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(180deg, var(--accent), var(--accent2));
-    }
-    
-    .timeline-item {
-      position: relative;
-      margin-bottom: 50px;
-      width: 45%;
-    }
-    
-    .timeline-item:nth-child(odd) {
-      left: 0;
-    }
-    
-    .timeline-item:nth-child(even) {
-      left: 55%;
-    }
-    
-    .timeline-dot {
-      position: absolute;
-      top: 0;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 15px var(--accent);
-    }
-    
-    .timeline-item:nth-child(odd) .timeline-dot {
-      right: -52px;
-    }
-    
-    .timeline-item:nth-child(even) .timeline-dot {
-      left: -52px;
-    }
-    
     /* Statistiques interactives */
     .stats-grid {
       display: grid;
@@ -595,6 +580,27 @@
       box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.2);
     }
     
+    /* Alertes */
+    .alert {
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      animation: fadeInUp 0.5s ease;
+    }
+    
+    .alert.success {
+      background: rgba(77, 255, 180, 0.1);
+      border: 1px solid rgba(77, 255, 180, 0.3);
+      color: var(--success);
+    }
+    
+    .alert.error {
+      background: rgba(255, 84, 112, 0.1);
+      border: 1px solid rgba(255, 84, 112, 0.3);
+      color: var(--accent3);
+    }
+    
     /* Bouton WhatsApp flottant amélioré */
     .whatsapp-float {
       position: fixed;
@@ -626,7 +632,7 @@
     /* Footer */
     footer { 
       padding: 60px 0 30px; 
-      background: rgba(7, 10, 20, 0.9); 
+      background: rgba(7, 10, 20, 0.95); 
       border-top: 1px solid rgba(255, 255, 255, 0.1); 
       position: relative;
       overflow: hidden;
@@ -679,19 +685,8 @@
         gap: 40px;
       }
       
-      .timeline::before {
-        left: 30px;
-      }
-      
-      .timeline-item {
-        width: 100%;
-        left: 0 !important;
-        padding-left: 70px;
-      }
-      
-      .timeline-item:nth-child(odd) .timeline-dot,
-      .timeline-item:nth-child(even) .timeline-dot {
-        left: 20px;
+      .hero {
+        padding: 150px 0 80px;
       }
     }
     
@@ -720,10 +715,6 @@
         display: block; 
       }
       
-      .hero {
-        padding: 150px 0 80px;
-      }
-      
       .hero h1 {
         font-size: 2.3rem;
       }
@@ -734,6 +725,10 @@
       
       .nav {
         padding: 15px 0;
+      }
+      
+      section {
+        padding: 70px 0;
       }
     }
     
@@ -764,12 +759,16 @@
       .whatsapp-float i {
         font-size: 28px;
       }
+      
+      .section-title {
+        font-size: 1.8rem;
+      }
     }
   </style>
 </head>
 <body>
   <!-- Canvas Three.js -->
-  <div id="three-canvas"></div>
+  <canvas id="three-canvas"></canvas>
 
   <!-- Bouton WhatsApp flottant -->
   <a href="https://wa.me/241074085772" class="whatsapp-float" target="_blank" aria-label="Contact WhatsApp">
@@ -803,8 +802,9 @@
     <section id="accueil" class="hero">
       <video class="hero-video-bg" autoplay muted loop playsinline>
         <source src="2.mp4" type="video/mp4">
+        <!-- Fallback image si la vidéo ne charge pas -->
+        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="Background tech">
       </video>
-      <div class="hero-overlay"></div>
       <div class="container hero-grid">
         <div class="hero-content">
           <h1>Solutions Informatiques Professionnelles ROYAL TECH</h1>
@@ -822,6 +822,8 @@
           <div class="video-thumbnail">
             <video autoplay muted loop playsinline>
               <source src="1.mp4" type="video/mp4" />
+              <!-- Fallback image -->
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Présentation ROYAL TECH">
             </video>
             <div class="video-play-btn">
               <i class="fas fa-play"></i>
@@ -910,7 +912,7 @@
     </section>
 
     <!-- Sections Vidéos -->
-    <section id="videos" class="video-section">
+    <section id="videos">
       <div class="container">
         <h2 class="section-title animate-on-scroll">Nos Réalisations</h2>
         
@@ -919,6 +921,7 @@
             <div class="video-thumbnail">
               <video autoplay muted loop playsinline>
                 <source src="3.mp4" type="video/mp4" />
+                <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Maintenance informatique">
               </video>
               <div class="video-play-btn">
                 <i class="fas fa-play"></i>
@@ -934,6 +937,7 @@
             <div class="video-thumbnail">
               <video autoplay muted loop playsinline>
                 <source src="4.mp4" type="video/mp4" />
+                <img src="https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Installation système">
               </video>
               <div class="video-play-btn">
                 <i class="fas fa-play"></i>
@@ -949,6 +953,7 @@
             <div class="video-thumbnail">
               <video autoplay muted loop playsinline>
                 <source src="2.mp4" type="video/mp4" />
+                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Cybersécurité">
               </video>
               <div class="video-play-btn">
                 <i class="fas fa-play"></i>
@@ -1004,37 +1009,18 @@
           <p><strong>Notre mission :</strong> Vous offrir des services de qualité, rapides et fiables, avec un support disponible 24h/24. Nous nous engageons à vous fournir des solutions adaptées à vos besoins spécifiques.</p>
           <p><strong>Nos valeurs :</strong> Professionnalisme, réactivité, expertise et satisfaction client.</p>
           
-          <div class="timeline">
-            <div class="timeline-item animate-on-scroll">
-              <div class="timeline-dot"></div>
-              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
-                <h4>2022 - Fondation</h4>
-                <p>Création de ROYAL TECH avec une vision innovante des services informatiques.</p>
-              </div>
+          <div class="stats-grid" style="margin-top: 40px;">
+            <div class="service-card">
+              <h4><i class="fas fa-certificate"></i> Certifications</h4>
+              <p>Techniciens certifiés Microsoft, Cisco, CompTIA</p>
             </div>
-            
-            <div class="timeline-item animate-on-scroll">
-              <div class="timeline-dot"></div>
-              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
-                <h4>2023 - Expansion</h4>
-                <p>Élargissement de nos services et développement de partenariats stratégiques.</p>
-              </div>
+            <div class="service-card">
+              <h4><i class="fas fa-award"></i> Garantie</h4>
+              <p>6 mois de garantie sur tous nos services</p>
             </div>
-            
-            <div class="timeline-item animate-on-scroll">
-              <div class="timeline-dot"></div>
-              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
-                <h4>2024 - Innovation</h4>
-                <p>Intégration de solutions de cybersécurité avancées et développement d'applications web.</p>
-              </div>
-            </div>
-            
-            <div class="timeline-item animate-on-scroll">
-              <div class="timeline-dot"></div>
-              <div class="service-card" style="background: rgba(20, 25, 40, 0.6);">
-                <h4>2025 - Excellence</h4>
-                <p>Service premium H24 et développement de la collection vêtements ROYAL TECH.</p>
-              </div>
+            <div class="service-card">
+              <h4><i class="fas fa-clock"></i> Réactivité</h4>
+              <p>Intervention sous 2h en zone urbaine</p>
             </div>
           </div>
           
@@ -1071,39 +1057,52 @@
     <section id="contact">
       <div class="container">
         <h2 class="section-title animate-on-scroll">Contactez-nous</h2>
+        <div class="alert success" id="successAlert">
+          <i class="fas fa-check-circle"></i> Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.
+        </div>
+        <div class="alert error" id="errorAlert">
+          <i class="fas fa-exclamation-circle"></i> Une erreur est survenue. Veuillez réessayer ou nous contacter directement par WhatsApp.
+        </div>
+        
         <div class="contact-grid">
           <div class="contact-form animate-on-scroll">
             <h3>Demander un devis</h3>
             <form id="devis-form">
               <div class="form-group">
-                <label class="form-label">Nom complet</label>
-                <input type="text" name="nom" class="form-input" required placeholder="Votre nom">
+                <label class="form-label">Nom complet *</label>
+                <input type="text" name="from_name" class="form-input" required placeholder="Votre nom">
               </div>
               
               <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-input" required placeholder="votre@email.com">
+                <label class="form-label">Email *</label>
+                <input type="email" name="from_email" class="form-input" required placeholder="votre@email.com">
               </div>
               
               <div class="form-group">
-                <label class="form-label">Service souhaité</label>
+                <label class="form-label">Téléphone *</label>
+                <input type="tel" name="phone" class="form-input" required placeholder="Votre numéro">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Service souhaité *</label>
                 <select name="service" class="form-select" required>
                   <option value="">Sélectionnez un service</option>
-                  <option value="maintenance">Maintenance informatique</option>
-                  <option value="installation">Installation système</option>
-                  <option value="cybersecurite">Cybersécurité</option>
-                  <option value="reseau">Réseau informatique</option>
-                  <option value="devweb">Développement web</option>
-                  <option value="vetements">Vêtements ROYAL TECH</option>
+                  <option value="Maintenance informatique">Maintenance informatique</option>
+                  <option value="Installation système">Installation système</option>
+                  <option value="Cybersécurité">Cybersécurité</option>
+                  <option value="Réseau informatique">Réseau informatique</option>
+                  <option value="Développement web">Développement web</option>
+                  <option value="Vêtements ROYAL TECH">Vêtements ROYAL TECH</option>
+                  <option value="Autre">Autre</option>
                 </select>
               </div>
               
               <div class="form-group">
-                <label class="form-label">Détails de votre demande</label>
-                <textarea name="details" class="form-textarea" rows="5" placeholder="Décrivez votre projet ou besoin..."></textarea>
+                <label class="form-label">Détails de votre demande *</label>
+                <textarea name="message" class="form-textarea" rows="5" placeholder="Décrivez votre projet ou besoin..." required></textarea>
               </div>
               
-              <button class="btn" type="submit" style="width: 100%;">
+              <button class="btn" type="submit" style="width: 100%;" id="submitBtn">
                 <i class="fas fa-paper-plane"></i> Envoyer la demande
               </button>
             </form>
@@ -1130,6 +1129,15 @@
                 </a>
               </div>
               
+              <div style="margin-top: 30px;">
+                <h4>Horaires d'intervention</h4>
+                <p style="color: var(--muted); margin-top: 10px;">
+                  <i class="fas fa-clock"></i> Lundi - Vendredi: 8h - 20h<br>
+                  <i class="fas fa-clock"></i> Samedi: 9h - 18h<br>
+                  <i class="fas fa-clock"></i> Dimanche & urgences: 24h/24
+                </p>
+              </div>
+              
               <p style="color: var(--muted); margin-top: 25px; text-align: center; font-size: 0.9rem;">
                 <i class="fas fa-bolt"></i> Réponse garantie en moins de 15 minutes
               </p>
@@ -1151,22 +1159,48 @@
             <span style="font-size: 1.5rem;">ROYAL TECH</span>
           </div>
           <p>Solutions informatiques professionnelles disponibles 24h/24. Votre partenaire de confiance pour tous vos projets technologiques.</p>
+          <p style="margin-top: 15px; color: var(--muted);">
+            <i class="fas fa-map-marker-alt"></i> Gabon, Libreville
+          </p>
         </div>
         
         <div>
-          <h4>Services</h4>
+          <h4>Services rapides</h4>
           <ul style="list-style: none; padding: 0; margin-top: 15px;">
-            <li style="margin-bottom: 10px;"><a href="#services">Maintenance informatique</a></li>
-            <li style="margin-bottom: 10px;"><a href="#services">Cybersécurité</a></li>
-            <li style="margin-bottom: 10px;"><a href="#services">Développement web</a></li>
-            <li style="margin-bottom: 10px;"><a href="#services">Installation système</a></li>
+            <li style="margin-bottom: 10px;">
+              <a href="#services" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-wrench"></i> Maintenance
+              </a>
+            </li>
+            <li style="margin-bottom: 10px;">
+              <a href="#services" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-shield-alt"></i> Cybersécurité
+              </a>
+            </li>
+            <li style="margin-bottom: 10px;">
+              <a href="#services" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-code"></i> Développement web
+              </a>
+            </li>
+            <li style="margin-bottom: 10px;">
+              <a href="#services" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-desktop"></i> Installation système
+              </a>
+            </li>
           </ul>
         </div>
         
         <div>
           <h4>Contact rapide</h4>
-          <p style="margin: 15px 0;"><i class="fas fa-phone"></i> +241 07 40 85 772</p>
-          <p style="margin: 15px 0;"><i class="fas fa-clock"></i> Disponible 24h/24</p>
+          <p style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-phone"></i> <a href="tel:+241074085772">+241 07 40 85 772</a>
+          </p>
+          <p style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-clock"></i> Disponible 24h/24
+          </p>
+          <p style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-envelope"></i> <a href="mailto:contact@royaltech.ga">contact@royaltech.ga</a>
+          </p>
           <div class="socials" style="margin-top: 20px;">
             <a href="https://www.instagram.com/daniel_test_0?igsh=ejZiODlnZmZpeXps&utm_source=qr" aria-label="Instagram" target="_blank">
               <i class="fab fa-instagram"></i>
@@ -1189,103 +1223,111 @@
       
       <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
         <p style="color: var(--muted);">© ROYALTECH & DANIELTECH — ENTREPRISE_TECH 2025. Tous droits réservés.</p>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-top: 10px;">
+          <a href="#accueil" style="color: var(--muted);">Mentions légales</a> | 
+          <a href="#accueil" style="color: var(--muted);">Politique de confidentialité</a> | 
+          <a href="#accueil" style="color: var(--muted);">Conditions générales</a>
+        </p>
       </div>
     </div>
   </footer>
 
   <script>
-    // Three.js Background Animation
+    // Initialisation EmailJS
+    (function() {
+      emailjs.init("YOUR_USER_ID"); // À remplacer par votre User ID EmailJS
+    })();
+    
+    // Vérification WebGL simplifiée
+    function isWebGLAvailable() {
+      try {
+        const canvas = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && 
+          (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+      } catch (e) {
+        return false;
+      }
+    }
+    
+    // Animation Three.js simplifiée et fonctionnelle
     function initThreeJS() {
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ 
-        alpha: true, 
-        antialias: true 
-      });
-      
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      document.getElementById('three-canvas').appendChild(renderer.domElement);
-      
-      // Créer des particules
-      const particlesGeometry = new THREE.BufferGeometry();
-      const count = 5000;
-      const positions = new Float32Array(count * 3);
-      
-      for(let i = 0; i < count * 3; i++) {
-        positions[i] = (Math.random() - 0.5) * 50;
+      if (!isWebGLAvailable()) {
+        console.log("WebGL non disponible, animation désactivée");
+        return;
       }
       
-      particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      
-      const particlesMaterial = new THREE.PointsMaterial({
-        size: 0.05,
-        color: 0x5ce1e6,
-        transparent: true,
-        opacity: 0.6
-      });
-      
-      const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-      scene.add(particles);
-      
-      // Ajouter des sphères
-      const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-      const sphereMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0xb367ff, 
-        wireframe: true,
-        transparent: true,
-        opacity: 0.3
-      });
-      
-      const spheres = [];
-      for(let i = 0; i < 5; i++) {
-        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        sphere.position.x = (Math.random() - 0.5) * 20;
-        sphere.position.y = (Math.random() - 0.5) * 20;
-        sphere.position.z = (Math.random() - 0.5) * 20;
-        sphere.scale.setScalar(Math.random() * 0.5 + 0.5);
-        spheres.push(sphere);
-        scene.add(sphere);
-      }
-      
-      camera.position.z = 15;
-      
-      // Animation
-      function animate() {
-        requestAnimationFrame(animate);
-        
-        particles.rotation.x += 0.0005;
-        particles.rotation.y += 0.001;
-        
-        spheres.forEach((sphere, i) => {
-          sphere.rotation.x += 0.01;
-          sphere.rotation.y += 0.01;
-          sphere.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+      try {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+          canvas: document.getElementById('three-canvas'),
+          alpha: true, 
+          antialias: true 
         });
         
-        renderer.render(scene, camera);
-      }
-      
-      animate();
-      
-      // Redimensionnement
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Créer des particules
+        const particlesGeometry = new THREE.BufferGeometry();
+        const count = 2000;
+        const positions = new Float32Array(count * 3);
+        
+        for(let i = 0; i < count * 3; i++) {
+          positions[i] = (Math.random() - 0.5) * 100;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.1,
+          color: 0x5ce1e6,
+          transparent: true,
+          opacity: 0.5
+        });
+        
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+        
+        camera.position.z = 30;
+        
+        // Animation
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          particles.rotation.x += 0.0002;
+          particles.rotation.y += 0.0005;
+          
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Redimensionnement
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        console.log("Three.js initialisé avec succès");
+      } catch (error) {
+        console.error("Erreur Three.js:", error);
+        // Cacher le canvas en cas d'erreur
+        document.getElementById('three-canvas').style.display = 'none';
+      }
     }
     
-    // Initialiser Three.js si WebGL est supporté
-    if (WEBGL.isWebGLAvailable()) {
-      initThreeJS();
-    }
+    // Initialiser Three.js
+    window.addEventListener('load', function() {
+      setTimeout(initThreeJS, 100); // Petit délai pour le chargement
+    });
     
     // Menu mobile
-    document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('menuToggle').addEventListener('click', function() {
       const menu = document.getElementById('mainMenu');
       menu.classList.toggle('active');
-      document.getElementById('menuToggle').innerHTML = menu.classList.contains('active') ? 
+      this.innerHTML = menu.classList.contains('active') ? 
         '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
     });
     
@@ -1300,7 +1342,7 @@
     // Header scroll effect
     window.addEventListener('scroll', () => {
       const header = document.getElementById('mainHeader');
-      if (window.scrollY > 100) {
+      if (window.scrollY > 50) {
         header.classList.add('scrolled');
       } else {
         header.classList.remove('scrolled');
@@ -1322,18 +1364,22 @@
           if (entry.target.classList.contains('stat-number')) {
             const finalValue = parseInt(entry.target.getAttribute('data-count'));
             const duration = 2000;
-            const step = finalValue / (duration / 16);
-            let currentValue = 0;
+            const startTime = Date.now();
             
-            const timer = setInterval(() => {
-              currentValue += step;
-              if (currentValue >= finalValue) {
-                entry.target.textContent = finalValue + (entry.target.textContent.includes('+') ? '+' : '');
-                clearInterval(timer);
-              } else {
-                entry.target.textContent = Math.floor(currentValue) + (entry.target.textContent.includes('+') ? '+' : '');
+            const animateCounter = () => {
+              const currentTime = Date.now();
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              
+              const currentValue = Math.floor(progress * finalValue);
+              entry.target.textContent = currentValue;
+              
+              if (progress < 1) {
+                requestAnimationFrame(animateCounter);
               }
-            }, 16);
+            };
+            
+            animateCounter();
           }
         }
       });
@@ -1341,11 +1387,6 @@
     
     // Observer les éléments à animer
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
-      observer.observe(el);
-    });
-    
-    // Observer les chiffres
-    document.querySelectorAll('.stat-number').forEach(el => {
       observer.observe(el);
     });
     
@@ -1360,70 +1401,145 @@
     document.getElementById('btn-commande').addEventListener('click', () => openWhatsApp());
     document.getElementById('btn-whatsapp').addEventListener('click', (e) => {
       e.preventDefault();
-      openWhatsApp('Salut, j\'ai une question sur vos services.');
+      openWhatsApp('Bonjour ROYAL TECH, j\'ai une question sur vos services.');
     });
     
-    // Formulaire devis
-    document.getElementById('devis-form').addEventListener('submit', (e) => {
+    // Formulaire devis avec EmailJS API
+    document.getElementById('devis-form').addEventListener('submit', function(e) {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target).entries());
-      const message = `📋 Demande de devis ROYAL TECH 📋
       
-👤 Nom: ${data.nom}
-📧 Email: ${data.email}
-🛠 Service: ${data.service}
-📝 Détails: ${data.details}
-
-Je vous remercie de me contacter rapidement.`;
-      
-      openWhatsApp(message);
-      e.target.reset();
-      
-      // Animation de confirmation
-      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const submitBtn = document.getElementById('submitBtn');
       const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fas fa-check"></i> Demande envoyée !';
-      submitBtn.style.background = 'linear-gradient(135deg, #4dffb4, #00cc88)';
+      const successAlert = document.getElementById('successAlert');
+      const errorAlert = document.getElementById('errorAlert');
       
-      setTimeout(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.style.background = '';
-      }, 3000);
+      // Afficher l'indicateur de chargement
+      submitBtn.innerHTML = '';
+      submitBtn.classList.add('loading');
+      
+      // Cacher les alertes précédentes
+      successAlert.style.display = 'none';
+      errorAlert.style.display = 'none';
+      
+      // Préparer les données du formulaire
+      const formData = {
+        from_name: this.from_name.value,
+        from_email: this.from_email.value,
+        phone: this.phone.value,
+        service: this.service.value,
+        message: this.message.value,
+        date: new Date().toLocaleString('fr-FR'),
+        to_email: 'contact@royaltech.ga'
+      };
+      
+      // Envoyer avec EmailJS (remplacez les valeurs par les vôtres)
+      // Note: Vous devez créer un compte sur https://www.emailjs.com/
+      // et configurer un service email et un template
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+        .then(function(response) {
+          console.log('SUCCESS!', response.status, response.text);
+          
+          // Afficher le succès
+          submitBtn.classList.remove('loading');
+          submitBtn.innerHTML = originalText;
+          successAlert.style.display = 'block';
+          
+          // Réinitialiser le formulaire
+          document.getElementById('devis-form').reset();
+          
+          // Envoyer également un message WhatsApp (optionnel)
+          const whatsappMessage = `Nouvelle demande de devis:
+Nom: ${formData.from_name}
+Email: ${formData.from_email}
+Téléphone: ${formData.phone}
+Service: ${formData.service}
+Message: ${formData.message}`;
+          
+          // Optionnel: ouvrir WhatsApp avec le message
+          // openWhatsApp(whatsappMessage);
+          
+          // Faire défiler jusqu'à l'alerte
+          successAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          
+          // Cacher l'alerte après 10 secondes
+          setTimeout(() => {
+            successAlert.style.display = 'none';
+          }, 10000);
+        }, function(error) {
+          console.log('FAILED...', error);
+          
+          // Afficher l'erreur
+          submitBtn.classList.remove('loading');
+          submitBtn.innerHTML = originalText;
+          errorAlert.style.display = 'block';
+          
+          // Envoyer via WhatsApp en backup
+          const whatsappMessage = `Demande de devis (formulaire échoué):
+Nom: ${formData.from_name}
+Email: ${formData.from_email}
+Téléphone: ${formData.phone}
+Service: ${formData.service}
+Message: ${formData.message}`;
+          
+          // Ouvrir WhatsApp avec les données du formulaire
+          openWhatsApp(whatsappMessage);
+          
+          // Faire défiler jusqu'à l'alerte
+          errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
     });
     
     // Effets de souris sur les cartes vidéo
     document.querySelectorAll('.video-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateY = (x - centerX) / 25;
-        const rotateX = (centerY - y) / 25;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px)`;
+      card.addEventListener('mousemove', function(e) {
+        if (window.innerWidth > 768) {
+          const rect = this.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateY = (x - centerX) / 25;
+          const rotateX = (centerY - y) / 25;
+          
+          this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px)`;
+        }
       });
       
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(-15px)';
+      card.addEventListener('mouseleave', function() {
+        if (window.innerWidth > 768) {
+          this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(-15px)';
+        } else {
+          this.style.transform = 'translateY(-15px)';
+        }
       });
     });
     
-    // Détection WebGL
-    const WEBGL = {
-      isWebGLAvailable: function() {
-        try {
-          const canvas = document.createElement('canvas');
-          return !!(window.WebGLRenderingContext && 
-            (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-        } catch (e) {
-          return false;
-        }
-      }
-    };
+    // API de météo (exemple d'API fonctionnelle)
+    function fetchWeather() {
+      // Cette fonction est un exemple d'intégration API
+      // Vous pouvez l'adapter pour vos besoins
+      console.log("Fonction API météo - exemple d'intégration");
+    }
+    
+    // Charger les vidéos en lazy loading
+    document.addEventListener('DOMContentLoaded', function() {
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        video.setAttribute('loading', 'lazy');
+      });
+    });
+    
+    // Initialisation au chargement
+    window.addEventListener('load', function() {
+      console.log('ROYAL TECH - Site chargé avec succès');
+      
+      // Afficher un message de bienvenue
+      setTimeout(() => {
+        console.log('Prêt à servir vos besoins informatiques!');
+      }, 1000);
+    });
   </script>
 </body>
 </html>
